@@ -23,16 +23,29 @@ angular.module('myApp.island', ['ngRoute'])
   ];
   vm.numberOfIsland = 0;
 
-  //function to generate island
+  //function to generate island and counting number of island
   vm.generateIsland = function (event) {
     event.preventDefault();
-    vm.displayIsland = createMatrixArray(vm.param);
-    vm.generatedIslandMatrix = angular.copy(vm.displayIsland);
-    vm.numberOfIsland = getNumberOfIsland();
-};
+    vm.displayIsland = createMatrixArray(vm.param); //html purpose,view only array
+    vm.generatedIslandMatrix = angular.copy(vm.displayIsland); //process the matrix
+    vm.numberOfIsland = getNumberOfIsland(); //get number of island
+  };
 
-//to get number of island
-function getNumberOfIsland(){
+  //to create 2dimensional array based on input param
+  function createMatrixArray(size){
+    let arr = [];
+    for (let i=0;i<size;i++) {
+      let cell = new Array(size);
+      for (let j=0;j<size;j++) {
+        cell[j] = (randomIntFromInterval(0,1)).toString();
+      }
+      arr[i] = cell;
+    }
+    return arr;
+  }
+
+  //to get number of island
+  function getNumberOfIsland(){
     if (vm.generatedIslandMatrix !== null){
       var numberOfIsland = 0;
       var len = vm.param;
@@ -49,153 +62,99 @@ function getNumberOfIsland(){
       return numberOfIsland;
     }
     return 0;
-}
-
-//find 8 directional neighbour
-function findNeighbourhood(island){
-  var len = island.length;
-  var top=null;
-  var i=0;
-  var j=0;
-  while(len--){
-    top = island.pop();
-    i = top.row;
-    j = top.col;
-    if(vm.generatedIslandMatrix[i] && vm.generatedIslandMatrix[i][j] && vm.generatedIslandMatrix[i][j] === LAND){
-      vm.generatedIslandMatrix[i][j] = '99';
-      island.push({row : i + 1, col : j}); //2
-      island.push({row : i + 1, col : j+1}); //3
-      island.push({row : i + 1, col : j-1}); //1
-      island.push({row : i - 1, col : j}); //4
-      island.push({row : i, col : j + 1}); // 6
-      island.push({row : i-1, col : j + 1}); // 9
-      island.push({row : i-1, col : j - 1}); // 7
-      island.push({row : i, col : j - 1});// 8
-    }
-  }
-  if(island.length !== 0){
-    findNeighbourhood(island);
-  }
-}
-
-// to check is the land have neighbour or connecting to other land
-function isConnectingLand(row,col){
-  var matrixSize = vm.param;
-  var connectingArray =[];
-  //extract 8 direction into 1 dimenssion array
-  //my self notes, is need to optimize the code,
-  //to check the border :)
-  try {
-    connectingArray.push(vm.displayIsland[row+1][col]); //2
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row+1][col+1]); //3
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row+1][col-1]); //1
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row-1][col]); //4
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row][col+1]); // 6
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row-1][col+1]); // 9
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row-1][col-1]); // 7
-  }catch(err) {
-    //do nothing
-  }
-  try {
-    connectingArray.push(vm.displayIsland[row][col-1]);// 8
-  }catch(err) {
-    //do nothing
   }
 
-  //check if land have neighbour of land
-  if (connectingArray!==null && connectingArray.length>1){
-    for (let i = 0;i<connectingArray.length;i++){
-      if(connectingArray[i] === LAND){
-        return true;
+  //find 8 directional neighbour
+  function findNeighbourhood(island){
+    var len = island.length;
+    var top=null;
+    var i=0;
+    var j=0;
+    while(len--){
+      top = island.pop();
+      i = top.row;
+      j = top.col;
+      if(vm.generatedIslandMatrix[i] && vm.generatedIslandMatrix[i][j] && vm.generatedIslandMatrix[i][j] === LAND){
+        vm.generatedIslandMatrix[i][j] = '99';
+        island.push({row : i + 1, col : j}); //2
+        island.push({row : i + 1, col : j+1}); //3
+        island.push({row : i + 1, col : j-1}); //1
+        island.push({row : i - 1, col : j}); //4
+        island.push({row : i, col : j + 1}); // 6
+        island.push({row : i-1, col : j + 1}); // 9
+        island.push({row : i-1, col : j - 1}); // 7
+        island.push({row : i, col : j - 1});// 8
       }
     }
+    if(island.length !== 0){
+      findNeighbourhood(island);
+    }
   }
 
-  return false;
-}
-
-//to create 2dimensional array based on input param
-function createMatrixArray(size){
-  let arr = [];
-  for (let i=0;i<size;i++) {
-    let cell = new Array(size);
-    for (let j=0;j<size;j++) {
-      cell[j] = (randomIntFromInterval(0,1)).toString();
+  // to check is the land have neighbour or connecting to other land
+  function isConnectingLand(row,col){
+    var matrixSize = vm.param;
+    var connectingArray =[];
+    //extract 8 direction into 1 dimenssion array
+    //my self notes, is need to optimize the code,
+    //to check the border :)
+    try {
+      connectingArray.push(vm.displayIsland[row+1][col]); //2
+    }catch(err) {
+      //do nothing
     }
-    arr[i] = cell;
-  }
-  return arr;
-}
-
-//useless function to handle promise function
-function createMatrixArrayPromise(size){
-  return new Promise(function(resolve, reject){
-    if (size > 0){
-      let arr = [];
-      for (let i=0;i<size;i++) {
-        let cell = new Array(size);
-        for (let j=0;j<size;j++) {
-          cell[j] = randomIntFromInterval(0,1);
-        }
-        arr[i] = cell;
-      }
-      resolve(arr);
-    }else{
-      reject(null);
+    try {
+      connectingArray.push(vm.displayIsland[row+1][col+1]); //3
+    }catch(err) {
+      //do nothing
     }
-  })
-}
-//useless function to handle promise function
-function getNumberOfIslandPromise(){
-  return new Promise(function(resolve, reject){
-    if (vm.generatedIslandMatrix !== null){
-      var x, y, count = 0, m = vm.generatedIslandMatrix.length, n;
-      for(x = 0; x < m; x++){
-        n = vm.generatedIslandMatrix[0].length;
-        for(y = 0; y < n; y++){
-          if(vm.generatedIslandMatrix[x][y] === LAND){
-            findNeighbourhood([{row : x, col : y}]);
-            if(isConnectingLand(x,y)){
-              count++;
-            }
-          }
+    try {
+      connectingArray.push(vm.displayIsland[row+1][col-1]); //1
+    }catch(err) {
+      //do nothing
+    }
+    try {
+      connectingArray.push(vm.displayIsland[row-1][col]); //4
+    }catch(err) {
+      //do nothing
+    }
+    try {
+      connectingArray.push(vm.displayIsland[row][col+1]); // 6
+    }catch(err) {
+      //do nothing
+    }
+    try {
+      connectingArray.push(vm.displayIsland[row-1][col+1]); // 9
+    }catch(err) {
+      //do nothing
+    }
+    try {
+      connectingArray.push(vm.displayIsland[row-1][col-1]); // 7
+    }catch(err) {
+      //do nothing
+    }
+    try {
+      connectingArray.push(vm.displayIsland[row][col-1]);// 8
+    }catch(err) {
+      //do nothing
+    }
+
+    //check if land have neighbour of land
+    if (connectingArray!==null && connectingArray.length>1){
+      for (let i = 0;i<connectingArray.length;i++){
+        if(connectingArray[i] === LAND){
+          return true;
         }
       }
-      resolve(count);
-    }else{
-      reject(null);
     }
-  })
-}
 
-function randomIntFromInterval(min,max)
-{
-  return Math.floor(Math.random()*(max-min+1)+min);
-}
+    return false;
+  }
 
+  //
+  function randomIntFromInterval(min,max)
+  {
+    return Math.floor(Math.random()*(max-min+1)+min);
+  }
 
 }]);
