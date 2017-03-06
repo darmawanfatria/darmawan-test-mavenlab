@@ -11,7 +11,10 @@ Software Developer Practical Test
   - island folder :
     - island.controller.js
     - island.html
-
+- clone the project
+- npm install
+- npm start
+- open the browser then use this http://localhost:8000/#!/island
 
 ## Project Description
 This project is an application skeleton for a typical [AngularJS][angularjs] web app. You can use it
